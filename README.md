@@ -1,54 +1,37 @@
-# Distributed Monitoring System
+Système Distribué de Supervision des noeuds d'un réseau
 
-A lightweight **Distributed Monitoring System** implemented in Python.
-This project demonstrates a **client–server architecture** where multiple monitoring agents collect system metrics and send them to a centralized server.
+1. Présentation du projet
 
-The project was developed as part of a **Distributed Systems course**.
+Ce projet a été réalisé dans le cadre du module Systèmes Répartis en Master 1 Réseaux et Infrastructures Virtuelles.
 
----
+L’objectif du projet est de développer un système distribué de supervision des noeuds d'un réseau.
 
-# Project Overview
+Le système repose sur une architecture client–serveur:
 
-Monitoring systems are essential for maintaining the reliability and performance of IT infrastructures.
+* Les clients (agents) collectent les métriques système.
+* Le serveur central reçoit les données, les affiche et les enregistre.
 
-This project implements a simplified distributed monitoring platform where:
+Les informations collectées permettent de surveiller l’état des machines d’un réseau.
 
-• Client agents collect system metrics
-• Metrics are sent to a central monitoring server
-• The server processes and stores monitoring data
-• The system detects abnormal system behavior
 
----
+2. Architecture du système
 
-# System Architecture
+Le système est composé de deux éléments principaux :
 
-The monitoring system follows a **centralized architecture**.
+* Agent client
 
-Client Node 1
-Client Node 2  → Monitoring Server → SQLite Database
-Client Node 3
+Le client collecte les informations système et les envoie périodiquement au serveur.
 
-Each client periodically sends system information to the monitoring server.
+* Serveur de supervision
 
----
+Le serveur reçoit les métriques envoyées par les clients, les affiche dans le terminal et les enregistre dans une base de données.
 
-# Key Features
+Plusieurs clients peuvent se connecter au serveur simultanément.
 
-• Distributed monitoring architecture
-• Multi-client support
-• CPU usage monitoring
-• Memory usage monitoring
-• System uptime monitoring
-• Network port monitoring
-• Service detection
-• Metrics storage using SQLite database
-• Logging system for monitoring events
 
----
+3. Structure du projet
 
-# Project Structure
 
-```
 distributed-monitoring-system
 │
 ├── client
@@ -60,115 +43,161 @@ distributed-monitoring-system
 ├── config
 │   └── config.py
 │
-├── database
-│
 ├── logs
 │
-├── metrics.db
-├── monitoring.db
+├── database
 │
 └── README.md
-```
 
----
 
-# Technologies Used
 
-Python
-TCP Sockets
-JSON
-SQLite
-Multi-threading
-Logging
+4. Explication du fonctionnement du code
 
----
+4.1 Le client (client.py)
 
-# How the System Works
+Le programme client agit comme un agent de supervision.
 
-1. The client collects system metrics.
-2. The metrics are converted to JSON format.
-3. The client sends data to the monitoring server using TCP sockets.
-4. The server receives and processes the data.
-5. The metrics are stored in the SQLite database.
+Il réalise plusieurs tâches :
 
----
+* Collecte des métriques système
 
-# Example Metrics Sent by Client
+Le client utilise la bibliothèque psutil pour collecter :
 
-```json
-{
-  "node": "client-node",
-  "os": "Windows",
-  "cpu": 45,
-  "memory": 70,
-  "uptime": 15000
-}
-```
+* utilisation du CPU
+* utilisation de la mémoire
+* temps de fonctionnement du système (uptime)
+* Vérification des ports
+Certains ports réseau sont vérifiés afin de savoir s’ils sont ouverts ou fermés 
+* Vérification des services
+Le client vérifie également si certains services ou processus sont actifs sur la machine.
 
----
 
-# Installation
+Les métriques collectées sont :
 
-Clone the repository:
+1. converties au format JSON
+2. envoyées au serveur via une connexion TCP
 
-```
-git clone https://github.com/oumykairygaye-wq/Projet_Final_Syst-me_R-parti.git
-```
+Les données sont envoyées toutes les 5 secondes.
 
-Navigate to the project directory:
 
-```
-cd distributed-monitoring-system
-```
 
-Install required dependency:
+4.2 Le serveur (server.py)
 
-```
-pip install psutil
-```
+Le serveur est le composant central du système.
 
----
+* Réception des connexions
 
-# Running the Project
+Le serveur ouvre un socket TCP et attend les connexions des clients.
 
-Start the server:
+* Gestion de plusieurs clients
 
-```
-python server/server.py
-```
+Pour permettre à plusieurs clients de se connecter en même temps, le serveur utilise le multi-threading.
 
-Start the client:
+Chaque client est traité dans un thread indépendant.
 
-```
-python client/client.py
-```
+* Traitement des métriques
 
-The client will start sending monitoring metrics to the server.
+Lorsque le serveur reçoit un message :
 
----
+* il décode le message JSON
+* il extrait les métriques
+* il affiche les informations dans le terminal
 
-# Future Improvements
+* Enregistrement des données
 
-Possible improvements include:
+Les métriques reçues sont enregistrées dans une **base de données SQLite** afin de conserver un historique.
 
-• Web monitoring dashboard
-• Data visualization graphs
-• Email alert system
-• Secure communication between nodes
+* Système d’alerte
 
----
+Le serveur peut générer une alerte si :
 
-# Academic Context
+* l’utilisation du CPU dépasse 90%.
 
-This project was developed for the **Distributed Systems course**.
 
-Master 1 – Networks and Virtual Infrastructure
-Université Numérique Cheikh Hamidou Kane
 
----
+5 Technologies utilisées
 
-# Author
+Les technologies utilisées dans ce projet sont :
+
+* Python
+* Sockets TCP
+* JSON
+* SQLite
+* Multi-threading
+* Logging
+* Bibliothèque **psutil**
+
+
+
+5 Environnement de développement
+
+Le projet a été développé en utilisant :
+
+* Visual Studio Code comme environnement de développement
+* Python pour l’implémentation du système distribué
+
+
+
+6 Choix techniques
+
+Plusieurs choix techniques ont été réalisés lors du développement du projet.
+
+Le langage Python a été choisi pour sa simplicité et sa capacité à développer rapidement des applications réseau.
+
+La communication entre le client et le serveur utilise les sockets TCP, ce qui garantit une transmission fiable des données.
+
+Le format JSON a été utilisé pour structurer les données échangées entre le client et le serveur.
+
+La bibliothèque psutil permet de récupérer facilement les métriques système.
+
+Pour le stockage des données, SQLite a été choisi car il s’agit d’une base de données légère qui ne nécessite pas de serveur externe.
+
+Le projet a été développé avec Visual Studio Code, ce qui a facilité l’organisation du code et le débogage du programme.
+
+
+
+7 Difficultés rencontrées
+
+Durant la réalisation du projet, certaines difficultés ont été rencontrées.
+
+La première difficulté concernait la **communication entre le client et le serveur**. Au début, les métriques envoyées par le client n’étaient pas correctement affichées sur le serveur.
+
+Une autre difficulté était la **gestion de plusieurs clients simultanément**, ce qui a nécessité l’utilisation du multi-threading.
+
+La compréhension et l’utilisation de la bibliothèque **psutil** ont également demandé un certain temps d’apprentissage.
+
+Enfin, il a fallu organiser correctement la **structure du projet** afin de rendre le code plus clair et plus facile à maintenir.
+
+
+
+8 Exécution du projet
+
+* Lancer le serveur
+
+python server/server.py avec la commande suivante: python -m server.server 
+
+
+* Lancer le client
+
+python client/client.py avec la commande suivante : python -m client.client
+
+
+Le client envoie automatiquement les métriques au serveur toutes les 5 secondes.
+
+
+
+9 Améliorations possibles
+
+Dans une version future du projet, plusieurs améliorations pourraient être envisagées :
+
+* création d’une interface web de supervision
+* visualisation des métriques 
+* système d’alertes plus avancé
+* déploiement du système sur plusieurs machines dans un environnement réel.
+
+
+# Auteur
 
 Oumy Kairy Gaye
 
-
+Master 1 – Réseaux et Infrastructures Virtuelles
